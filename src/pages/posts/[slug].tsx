@@ -6,7 +6,11 @@ import { RichText } from "prismic-dom"
 import { getPrismicClient } from "../../services/prismic"
 
 import styles from './post.module.scss';
+import { ParsedUrlQuery } from "querystring"
 
+interface Params extends ParsedUrlQuery {
+  slug: string;
+}
 
 
 interface IPostProps {
@@ -49,7 +53,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, params }) =>
       }
     }
   }
-  const { slug } = params;
+  const { slug } = params as Params;
+  // console.log(params);
 
   const prismic = getPrismicClient(req);
 
