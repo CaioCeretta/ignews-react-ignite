@@ -51,7 +51,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       )
 
     } catch (err) {
+      if(err instanceof Error) {
       return res.status(400).send(`Webhook error: ${err.message} `)
+      }
     }
 
 
