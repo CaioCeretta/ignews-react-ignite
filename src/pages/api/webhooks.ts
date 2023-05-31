@@ -49,7 +49,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
 
-    const { type } = event;
+    const type  = event.type;
 
 
     if (relevantEvents.has(type)) {
