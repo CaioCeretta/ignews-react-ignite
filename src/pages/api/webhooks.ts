@@ -34,23 +34,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const secret = req.headers["stripe-signature"];
 
+    event = stripe.webhooks.constructEvent(
+      buf,
+      secret || "",
+      process.env.STRIPE_WEBHOOK_SECRET || ""
+    );
 
-    try {
-      
-      event = stripe.webhooks.constructEvent(
-        buf,
-        secret || "",
-        process.env.STRIPE_WEBHOOK_SECRET || ""
-      );
-
-    } catch (err) {
-      if (err instanceof Error) {
-        return res.status(400).send(`Webhook error: ${err.message} `);
-      }
+    if(!event) {
+      return;
     }
 
-    const type  = event.type;
-
+    const type = event.type;
 
     if (relevantEvents.has(type)) {
       try {
@@ -64,7 +58,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
               subscription.id,
               subscription.customer.toString(),
               true
-              );
+            );
 
             break;
 
