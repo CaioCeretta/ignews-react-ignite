@@ -52,37 +52,36 @@ export default NextAuth({
       }
     },
     async signIn({ user, account, profile }) {
-      const { email } = user
+      const { email } =  user ;
 
-      try {
-        // FQL
-        //Cria um novo usuário com email
+      try{
         await fauna.query(
-          //se o usuário não existe, cria um novo usuário, senão retorna o usuário
           q.If(
-            // não existe o usuário com o email
             q.Not(
               q.Exists(
                 q.Match(
                   q.Index('user_by_email'),
-                  q.Casefold(email!)
+                  q.Casefold(user.email || '')
                 )
               )
             ),
-            // cria um usuario
-            q.Create(q.Collection('users'), { data: { email } }),
-            // retorna o usuário
+            q.Create(
+              q.Collection('users'),
+              { data: { email }}
+            ),
             q.Get(
-              q.Match(q.Index('user_by_email'), q.Casefold(email!))
+              q.Match(
+                q.Index('user_by_email'),
+                q.Casefold(email || '')
+              )
             )
           )
-        )
+        );
 
-        return true
-      } catch (error) {
-        console.log('Error in FaunaDB: ' + error)
-
-        return false
+        return true;
+      } catch (err) {
+        console.log(err);
+        return false;
       }
     },
   },
