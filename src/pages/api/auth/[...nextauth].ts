@@ -5,14 +5,14 @@ import { query as q } from "faunadb";
 import { fauna } from "../../../services/fauna";
 
 export default NextAuth({
-  secret: process.env.NEXTAUTH_SECRET || '',
+  secret: process.env.NEXTAUTH_SECRET || "",
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || "",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "",
-       authorization: {
+      authorization: {
         params: {
-          scope: 'read:user',
+          scope: "read:user",
         },
       },
     }),
@@ -55,14 +55,16 @@ export default NextAuth({
       const { email } = user;
 
       try {
+        //Verificar se o user existe
         await fauna.query(
           q.If(
             q.Not(
-                q.Match(q.Index("user_by_email"), q.Casefold(user.email || ""))
-              ),
-            q.Create(q.Collection("users"), { data: { email: user.email } }),
+              q.Match(q.Index("user_by_email"), q.Casefold(email || ""))
+            ),
+            //Se não existir criar
+            q.Create(q.Collection("users"), { data: { email } }),
             q.Get(
-              q.Match(q.Index("user_by_email"), q.Casefold(user.email || ""))
+              q.Match(q.Index("user_by_email"), q.Casefold(email || ""))
             )
           )
         );
